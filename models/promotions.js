@@ -3,27 +3,8 @@ const Schema = mongoose.Schema;
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
 
-var commentSchema = new Schema({
-    rating:  {
-        type: Number,
-        min: 1,
-        max: 5,
-        required: true
-    },
-    comment:  {
-        type: String,
-        required: true
-    },
-    author:  {
-        type: String,
-        required: true
-    }
-}, {
-    timestamps: true
-});
-
-var dishSchema = new Schema({
-    name: {
+var promotionSchema = new Schema({
+    name:{
         type: String,
         required: true,
         unique: true
@@ -33,10 +14,6 @@ var dishSchema = new Schema({
         required: true
     },
     image: {
-        type: String,
-        required: true
-    },
-    category: {
         type: String,
         required: true
     },
@@ -52,12 +29,11 @@ var dishSchema = new Schema({
     featured: {
         type: Boolean,
         default:false      
-    },
-    comments:[commentSchema]
+    }
 }, {
     timestamps: true
 });
-// "Dish" name model/Schema/Document Created inside Database name "confusion"
-var Dishes = mongoose.model('Dish', dishSchema);
+// "promotion" name model or Schema or Document Created inside Database name "confusion"
+var Promotions = mongoose.model('promotion', promotionSchema);
 
-module.exports = Dishes;
+module.exports = Promotions;
