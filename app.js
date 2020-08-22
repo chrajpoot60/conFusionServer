@@ -7,6 +7,7 @@ var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 var passport = require('passport');
 var authenticate = require('./authenticate'); 
+var config = require('./config');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,7 +19,7 @@ const mongoose = require('mongoose');
 const Dishes = require('./models/dishes');
 const { signedCookie } = require('cookie-parser');
 
-const url = 'mongodb://localhost:27017/confusion';
+const url = config.mongoUrl;
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
@@ -36,39 +37,42 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 //app.use(cookieParser('12345-67890-78004-34567'));//signing cookies with secret key
 // using session for authentication instead of cookie
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-78004-34567',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
+// app.use(session({
+//   name: 'session-id',
+//   secret: '12345-67890-78004-34567',
+//   saveUninitialized: false,
+//   resave: false,
+//   store: new FileStore()
+// }));
 
 app.use(passport.initialize());
 //it will automatically serialize the user information and stored in session
 //session cookies already place with incoming client request 
 //client request automatically add session cookies into req.user 
-app.use(passport.session());
+//app.use(passport.session());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter); //use for authentication of users
 //body of authentication function
-function auth(req, res, next) {
-  console.log(req.user);
+// function auth(req, res, next) {
+//   console.log(req.user);
 
-  if(!req.user) {
-      var err = new Error('You are not authenticated:');
-      err.status = 403;
-      return next(err);
-  }
-  else {
-      next();
-  }
-}  
-//this function does not provide access to the next or below resources without user authentication
-app.use(auth); 
+//   if(!req.user) {
+//       var err = new Error('You are not authenticated:');
+//       err.status = 403;
+//       return next(err);
+//   }
+//   else {
+//       next();
+//   }
+// }  
+// //this function does not provide access to the next or below resources without user authentication
+// app.use(auth);
+
+/*now we verifying user for particular operations for each resource endpoints */
 
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
