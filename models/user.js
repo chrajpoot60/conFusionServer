@@ -3,6 +3,14 @@ var Schema = mongoose.Schema;
 var passportLocalMongoose = require('passport-local-mongoose');
 //here removed the username and password field because they already comes with 'passport-local-mongoose' plugin
 var userSchema = new Schema ({
+    firstname: {
+        type: String,
+        default: ''
+    },
+    lastname: {
+        type: String,
+        default: ''
+    },
     admin: {
         type: Boolean,
         default: false

@@ -22,15 +22,26 @@ router.post('/signup', (req, res, next) => {
       res.json({err: err});
     }
     else {
-      //here we try to authenticate, user which we already register early
+      if(req.body.firstname)
+        user.firstname = req.body.firstname;
+      if(req.body.lastname)
+        user.lastname = req.body.lastname;
+      user.save((err, user) => {
+        if(err) {
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({err: err}); 
+        }
+        //here we try to authenticate, user which we already register early
       //we use authenticate() function which come with 'local-mongoose' plugin 
       //and it automatically return  error if authentication failed
       //and if authentication success then next function and parameters follows
-      passport.authenticate('local') (req, res, () => {
-      //when authentication done 'authenticate()' method add user property inside req message  
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'application/json');
-        res.json({success: true, status: 'Registration Successful!'});
+        passport.authenticate('local') (req, res, () => {
+        //when authentication done 'authenticate()' method add user property inside req message  
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json({success: true, status: 'Registration Successful!'});
+        })         
       });
     }
   });
