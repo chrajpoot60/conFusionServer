@@ -8,8 +8,15 @@ var router = express.Router();
 router.use(bodyParser.json());
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+//callback function doesn't required to define the parameters inside it and also the defination of itself
+//thats's why we use callback function here
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+  
+  User.find({}).then((users) => {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json')
+    res.json(users)
+}, error => next(error)).catch(error => next(error))
 });
 
 router.post('/signup', (req, res, next) => {
@@ -56,11 +63,11 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   res.json({success: true, token: token, status: 'You are successfully logged in!'});
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', (req, res, next) => {
   if(req.session) {
-    req.session.destroy(); //destorying the session for particular user
-    res.clearCookie('session-id'); // clear cookie for that particular user
-    res.redirect('/'); //moving to the homepage
+    req.session.destroy()
+    res.clearCookie('session-id')
+    res.redirect('/')
   }
   else {
     var err = new Error('You are not logged in!');
@@ -68,5 +75,4 @@ router.get('/logout', (req, res) => {
     next(err);
   }
 })
-
 module.exports = router;
