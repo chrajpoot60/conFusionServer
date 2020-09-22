@@ -7,6 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('confusionserver:server');
 var http = require('http');
+//for secure http server
 var https = require('https');
 var fs = require('fs');
 
@@ -16,12 +17,13 @@ var fs = require('fs');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
+//add the port number with 3000
 app.set('secPort', port+443);
 
 /**
  * Create HTTP server.
  */
-
+//defining the js object for secure server to add key and certificate
  var option = {
     key: fs.readFileSync(__dirname+'/private.key'),
     cert: fs.readFileSync(__dirname+'/certificate.pem')
@@ -40,6 +42,7 @@ server.on('listening', onListening);
 secureServer.listen(app.get('secPort'), () => {
   console.log('secureServer listening on port ',app.get('secPort'));
 });
+//calling onError or onListening function in case of error or listening 
 secureServer.on('error', onError);
 secureServer.on('listening', onListening);
 
