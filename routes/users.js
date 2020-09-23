@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var User = require('../models/user');
 var passport = require('passport');
 var authenticate = require('../authenticate');
+var cors = require('./cors');
 
 var router = express.Router();
 router.use(bodyParser.json());
@@ -10,7 +11,7 @@ router.use(bodyParser.json());
 /* GET users listing. */
 //callback function doesn't required to define the parameters inside it and also the defination of itself
 //thats's why we use callback function here
-router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
   
   User.find({}).then((users) => {
     res.statusCode = 200;
@@ -19,7 +20,7 @@ router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req,
 }, error => next(error)).catch(error => next(error))
 });
 
-router.post('/signup', (req, res, next) => {
+router.post('/signup', cors.corsWithOptions,  (req, res, next) => {
   //'local-mongoose' plugin provide some method for signup and login
   //'register' method is example of plugin method
   User.register(new User({username: req.body.username}), req.body.password, (err, user) => { 
@@ -55,7 +56,7 @@ router.post('/signup', (req, res, next) => {
 });
 //here username and password include in post req message body instead of authorization header
 
-router.post('/login', passport.authenticate('local'), (req, res) => {
+router.post('/login', cors.corsWithOptions,  passport.authenticate('local'), (req, res) => {
 
   var token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
@@ -63,7 +64,7 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
   res.json({success: true, token: token, status: 'You are successfully logged in!'});
 });
 
-router.get('/logout', (req, res, next) => {
+router.get('/logout', cors.corsWithOptions,  (req, res, next) => {
   if(req.session) {
     req.session.destroy()
     res.clearCookie('session-id')
