@@ -5,6 +5,7 @@ var User = require('./models/user');
 var JwtStrategy = require('passport-jwt').Strategy; //use for strategy in jwt
 var ExtractJwt = require('passport-jwt').ExtractJwt; //extract the jwt
 var jwt = require('jsonwebtoken'); //used to create sign and verify tokens
+var FacebookTokenStrategy = require('passport-facebook-token');
 
 var config = require('./config');
 
@@ -60,3 +61,30 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
         }
     }
     
+    //for authorization using facebook social media which is based on OAuth 2.0
+    exports.facebookPassport = passport.use(new FacebookTokenStrategy({
+        clientID: config.facebook.clientId,
+        clientSecret: config.facebook.clientSecret
+    }, (accessToken, refreshToken, profile, done) => {
+        User.findOne({facebookId: profile.id}, (err, user) => {
+            if (err) {
+                return done(err, false);
+            }
+            if (!err && user !== null) {
+                return done(null, user);
+            }
+            else {
+                user = new User({ username: profile.displayName });
+                user.facebookId = profile.id;
+                user.firstname = profile.name.givenName;
+                user.lastname = profile.name.familyName;
+                user.save((err, user) => {
+                    if (err)
+                        return done(err, false);
+                    else
+                        return done(null, user);
+                })
+            }
+        });
+    }
+));
