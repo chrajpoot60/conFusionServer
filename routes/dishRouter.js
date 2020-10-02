@@ -156,7 +156,7 @@ dishRouter.route('/:dishId')
                     }, (err) => next(err));
                 }
                 else {
-                    err = err = new Error('Dish ' + req.params.dishId + ' not found');
+                    err = new Error('Dish ' + req.params.dishId + ' not found');
                     err.status = 404;
                     return next(err);
                 } 
